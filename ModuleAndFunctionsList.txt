@@ -1,0 +1,16 @@
+Head
+- MOD ADD
+- MOD Multiply
+
+Tail
+- Comparator
+- Decompose
+- Power2Round
+- MakeHint/UseHint
+
+KECCAK
+- State initialization, Absorbing input, Permutation functions, Squeezing output
+
+Sample
+- Rejection Sampling
+- SampleInBall
