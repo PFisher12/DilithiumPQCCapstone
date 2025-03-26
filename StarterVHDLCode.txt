@@ -1,0 +1,28 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+Use work.GlobalVars.all;
+
+entity entityName is
+	port(
+		var1_in, var2_in, ... : in std_logic_vector(31 downto 0);
+		var1_out, var2_out, ... : out std_logic_vector(31 downto 0)
+		);
+end entityName;
+
+
+architecture behavior of entityName is
+
+signal var1_s : signed(63 downto 0); --example 64 bit signed integer
+signal var2_s : signed(31 downto 0); --example 32 bit signed integer
+
+begin
+	process(var1_s, var2_s)
+	begin
+		--assignments, equasions, etc...
+
+	end process;
+
+var1_out <= var2_s;
+
+end behavior;
