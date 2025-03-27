@@ -3,9 +3,8 @@ Head
 - MOD Multiply
 
 Tail
-- Comparator
-- Decompose
-- Power2Round
+- Decompose (using thise over Power2Round function)
+- HighBits/LowBits
 - MakeHint/UseHint
 
 KECCAK
