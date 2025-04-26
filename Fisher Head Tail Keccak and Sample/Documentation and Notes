@@ -1,0 +1,9 @@
+NOTES
+
+4/25/2025
+- DONE
+  - Ignore the zip files, all the folders have the most recent and up to date forms of code.
+  - The tail, keccak, and sample modules are working together correctly. They are working with one value input.
+- NEXT
+  - Test the tail, keccak, and sample implementation module with multiple inputs to confirm funtionality.
+  - Get it working with the BRAM.
