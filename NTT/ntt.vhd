@@ -25,6 +25,7 @@ end ntt;
 architecture RTL of ntt is
 
   --Butterfly Vars
+  signal ram_in_butterfly_s       : RAM_IN;
   signal butterfly_done_s         : std_logic := '0';
   signal butterfly_enable_s       : std_logic := '0';
   signal address_s                : std_logic_vector(7 downto 0) := "00000000";  --Current location of NTT, equiv to j variable in C
@@ -92,13 +93,13 @@ begin
           --Inputs
           ram_out => ram_out_ntt,
           --Outputs
-          ram_in  => ram_in_ntt
+          ram_in  => ram_in_butterfly_s
     );
 
 
   combinatorial : process (offset_s, offset_next_s, start_s, start_next_s, 
     address_s, address_next_s, mode_s, enable, reset, ntt_done_s, NTT_INTT_Select,
-    state_s, direction_s, butterfly_done_s)
+    state_s, direction_s, butterfly_done_s, ram_in_butterfly_s)
 
   begin
 
@@ -215,7 +216,7 @@ begin
               end if;
             when down =>
               --After butterfly, set direction to up
-                if(butterfly_done_s = '1' and butterfly_done_s'event) then --(((ram_in_internal_s.wren_a or ram_in_internal_s.wren_a) = '0') and (butterfly_done_s = '1'))     (butterfly_done_s = '1' and butterfly_done_s'event)
+                 if(((ram_in_butterfly_s.wren_a nor ram_in_butterfly_s.wren_b) = '0') and (butterfly_done_s = '1')) then  --check for rising edge of butterfly finishing AND the falling edge of the write enables
                   --Select butterfly up or down
                   direction_s <= up;
                 end if;
@@ -225,6 +226,8 @@ begin
       end case;
     end if;
   end process;
+
+  ram_in_ntt <= ram_in_butterfly_s;
 
 
 end RTL;
