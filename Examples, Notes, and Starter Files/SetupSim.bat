@@ -1,0 +1,1 @@
+start /B vsim -do setup.do
