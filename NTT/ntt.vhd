@@ -12,6 +12,8 @@ entity ntt is
         enable : in std_logic;
         reset  : in std_logic;
         NTT_INTT_Select : in std_logic;
+        --Outputs
+        ntt_ready : out std_logic;
 
     --RAM I/O
         --Inputs
@@ -50,7 +52,6 @@ architecture RTL of ntt is
   type mode is (waiting, NTT, INTT);
   signal mode_s : mode := waiting;
 
-  signal state_change_s : std_logic := '0';
   signal ntt_done_s     : std_logic := '0';
 
 begin
@@ -77,7 +78,7 @@ begin
           q       => zeta_inverse_s
     );
 
-  Forwardbutterfly : entity work.butterflyForward(RTL)
+  butterfly : entity work.butterfly(RTL)
     port map
     (
       --Control I/O
@@ -87,6 +88,7 @@ begin
           address => address_s,
           offset  => offset_s,
           zeta    => zeta_forward_s,
+          NTT_INTT_Select => NTT_INTT_Select,
           --Outputs
           butterfly_done    => butterfly_done_s,
       --RAM I/O
@@ -106,10 +108,14 @@ begin
     --NTT / INTT Select Block
     if(mode_s = waiting and enable = '1') then
       case NTT_INTT_Select is
-        when '0' => mode_s <= NTT;
-        when '1' => mode_s <= INTT;
-        when others => mode_s <= waiting;
+        when '0' => mode_s <= NTT;        ntt_ready <= '0';
+        when '1' => mode_s <= INTT;       ntt_ready <= '0';
+        when others => mode_s <= waiting; ntt_ready <= '1';
       end case;
+    elsif(mode_s /= waiting) then
+      ntt_ready <= '0';
+    else
+      ntt_ready <= '1';
     end if;
 
     --Reset Block
@@ -124,15 +130,11 @@ begin
 
       --Indexing Variables
       case NTT_INTT_Select is
-        when '0' =>     --NTT
-          offset_s        <= x"80";
-          offset_next_s   <= x"80";
-          zeta_address_s  <= x"01";
         when '1' =>     --INTT
           offset_s        <= x"01";
           offset_next_s   <= x"01";
           zeta_address_s  <= x"00";
-        when others => --error case
+        when others =>  --NTT
           offset_s        <= x"80";
           offset_next_s   <= x"80";
           zeta_address_s  <= x"01";
@@ -221,8 +223,6 @@ begin
                   direction_s <= up;
                 end if;
             end case;
-        when others =>
-          --reset?
       end case;
     end if;
   end process;

@@ -7,11 +7,15 @@ use work.GlobalVars.all;
 
 entity mainControl is
   port (
+    --temp IO for testbench testing
     clk             : in std_logic;
     selectTBCmds    : in std_logic;
     ram_in_from_TB  : in RAM_IN;
     enable_NTT      : in std_logic;
-    reset_NTT       : in std_logic
+    reset_NTT       : in std_logic;
+    NTT_INTT_Select : in std_logic;
+    ramSelect       : in std_logic_vector (1 downto 0);
+    ntt_ready       : out std_logic
   );
 
 end mainControl;
@@ -22,9 +26,7 @@ architecture RTL of mainControl is
   signal ram_in_from_main_s   : RAM_IN  := RAM_IN_INITIALIZE;
   signal ram_in_from_NTT_s    : RAM_IN  := RAM_IN_INITIALIZE;
   signal ram_out_from_main_s  : RAM_OUT := RAM_OUT_INITIALIZE;
-
-  signal ramSelect_s  : std_logic_vector (1 downto 0) := "00";
-  signal NTT_INTT_Select : std_logic := '0'; 
+  
 
 begin
 
@@ -33,7 +35,7 @@ begin
       --Control I/O
           --Inputs
           clk       => clk,
-          ramSelect => ramSelect_s,
+          ramSelect => ramSelect,
 
       --RAM I/O
           --Inputs
@@ -50,6 +52,7 @@ begin
           enable  => enable_NTT,
           reset   => reset_NTT,
           NTT_INTT_Select => NTT_INTT_Select,
+          ntt_ready => ntt_ready,
 
       --RAM I/O
           --Inputs
