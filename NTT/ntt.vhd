@@ -61,23 +61,23 @@ architecture RTL of ntt is
 
 begin
 
-  zetaForwardRom : entity work.ZetaForwardROM(SYN)
+  zetaForwardRom : entity work.romForwardZetas(RTL)
     port map
     (
       --RAM I/O
           --Inputs
-          clock   => clk,
+          clk     => clk,
           address => zeta_address_s,
           --Outputs
           q       => zeta_forward_s
     );
 
-    zetaInverseRom : entity work.ZetaInverseROM(SYN)
+    zetaInverseRom : entity work.romInverseZetas(RTL)
     port map
     (
       --RAM I/O
           --Inputs
-          clock   => clk,
+          clk     => clk,
           address => zeta_address_s,
           --Outputs
           q       => zeta_inverse_s

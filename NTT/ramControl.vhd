@@ -34,10 +34,10 @@ architecture RTL of ramControl is
 
 begin
 
-  ram0 : entity work.ram(SYN) --butterfly RAM
+  ram0 : entity work.bramTwoPort(RTL) --butterfly RAM
     port map
     (
-      clock     => clk,
+      clk       => clk,
       address_a => ram_in.address_a,
       address_b => ram_in.address_b,
       data_a    => ram_in.data_a,
@@ -48,10 +48,10 @@ begin
       q_b       => output_b_s_0
     );
 
-  ram1 : entity work.ram(SYN) --unused RAM
+  ram1 : entity work.bramTwoPort(RTL) --unused RAM
     port map
     (
-      clock     => clk,
+      clk       => clk,
       address_a => ram_in.address_a,
       address_b => ram_in.address_b,
       data_a    => ram_in.data_a,
