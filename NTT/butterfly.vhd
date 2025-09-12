@@ -117,10 +117,8 @@ begin
 
   --(MONT*MONT % Q) * (Q-1) % Q) * ((Q-1) >> 8) % Q;
   variable f_v : unsigned(31 downto 0) := x"0000A3FA";
-  
-  variable temp1_v : unsigned(31 downto 0);
-  variable temp2_v : unsigned(31 downto 0);
-  variable temp3_v : unsigned(63 downto 0);
+
+  variable montgom_in_v : unsigned(63 downto 0);
 
   variable INTT_data_a_v  : unsigned(31 downto 0);
   variable INTT_data_b_v  : unsigned(31 downto 0);
@@ -128,8 +126,20 @@ begin
   begin
 
     --Declare incremented address values
-    ram_in.address_a <= address; --a = p[j]
+    ram_in.address_a <= address;                                                --a = p[j]
     ram_in.address_b <= std_logic_vector(unsigned(address) + unsigned(offset)); --b = p[j+len]
+
+    --Calculate INTT signals:
+
+    --Calculate p[j] and p[j+len] for INTT
+    INTT_data_a_v := unsigned(ram_out.q_a) + unsigned(ram_out.q_b);     --p[j]
+    INTT_data_b_v := montgomeryReducerOut_s;                            --p[j+len]
+
+    montgom_in_v := (unsigned(zeta) * (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b)));
+
+    montgomeryReducerIn_INTT_a_s <= INTT_data_a_v * f_v;
+    montgomeryReducerIn_INTT_b_s <= INTT_data_b_v * f_v;
+
 
     case NTT_INTT_Select is  
       when '0' => --NTT
@@ -137,39 +147,19 @@ begin
         montgomeryReducerIn_s <= unsigned(zeta) * unsigned(ram_out.q_b);
 
         --Calculate p[j] and p[j+len]
-        ram_in.data_a <= std_logic_vector(unsigned(ram_out.q_a) + montgomeryReducerOut_s);        --p[j]
+        ram_in.data_a <= std_logic_vector(unsigned(ram_out.q_a) + montgomeryReducerOut_s);         --p[j]
         ram_in.data_b <= std_logic_vector(unsigned(ram_out.q_a) + Q2_v - montgomeryReducerOut_s);  --p[j+len]
 
-        --Defaults for INTT
-        montgomeryReducerIn_INTT_a_s <= (others => '0');
-        montgomeryReducerIn_INTT_b_s <= (others => '0');
-        INTT_data_a_v := (others => '0');
-        INTT_data_b_v := (others => '0');
-        temp1_v := (others => '0');
-        temp2_v := (others => '0');
-        temp3_v := (others => '0');
-
       when '1' => --INTT
-        --Calculate Montgomery as soon as memory is ready
-        temp1_v := (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b));
-        temp2_v := unsigned(zeta);
-        temp3_v := temp1_v * temp2_v;
-        --temp <= (unsigned(zeta) * (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b)));
-        montgomeryReducerIn_s <= temp3_v;
 
-        --Calculate p[j] and p[j+len]
-        INTT_data_a_v := unsigned(ram_out.q_a) + unsigned(ram_out.q_b);     --p[j]
+        montgomeryReducerIn_s <= montgom_in_v;
 
-        INTT_data_b_v := montgomeryReducerOut_s;                           --p[j+len]
-
-        if(offset = x"80") then                 --Check if the INTT is in its last iteration, if so add additional montgomery factor
-          montgomeryReducerIn_INTT_a_s <= INTT_data_a_v * f_v;
-          montgomeryReducerIn_INTT_b_s <= INTT_data_b_v * f_v;
+        if(offset = x"80") then
+          --Check if the INTT is in its last iteration, if so add additional montgomery factor
           ram_in.data_a <= std_logic_vector(montgomeryReducerOut_INTT_a_s);
           ram_in.data_b <= std_logic_vector(montgomeryReducerOut_INTT_b_s);
-        else                                   --Otherwise operate as normal
-          montgomeryReducerIn_INTT_a_s <= (others => '0');
-          montgomeryReducerIn_INTT_b_s <= (others => '0');
+        else
+          --Otherwise operate as normal
           ram_in.data_a <= std_logic_vector(INTT_data_a_v);
           ram_in.data_b <= std_logic_vector(INTT_data_b_v);
         end if;
