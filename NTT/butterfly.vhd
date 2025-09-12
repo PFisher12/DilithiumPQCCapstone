@@ -36,31 +36,14 @@ architecture RTL of butterfly is
   --Montgom Signals
   signal montgomeryReducerIn_s  : unsigned(63 downto 0); --Input to montgomery reducer
   signal montgomeryReducerOut_s : unsigned(31 downto 0); --Output of montgomery reduction fn, equiv to variable t in C-
-
-  signal INTT_data_a_s  : unsigned(31 downto 0);
-  signal INTT_data_b_s  : unsigned(31 downto 0);
   signal montgomeryReducerIn_INTT_a_s   : unsigned (63 downto 0);
   signal montgomeryReducerIn_INTT_b_s   : unsigned (63 downto 0);
   signal montgomeryReducerOut_INTT_a_s  : unsigned (31 downto 0);
   signal montgomeryReducerOut_INTT_b_s  : unsigned (31 downto 0);
 
-  signal temp1 : unsigned(31 downto 0);
-  signal temp2 : unsigned(31 downto 0);
-  signal temp3 : unsigned(63 downto 0);
-
   --State Machine Signals
   type state is (set, writeback);
   signal state_s  : state     := set;
-
-  --2*Q
-  signal Q2_s : unsigned(31 downto 0) := x"00FFC002";
-
-  --256*Q
-  signal Q256_s : unsigned(31 downto 0) := x"7FE00100";
-
-  --(MONT*MONT % Q) * (Q-1) % Q) * ((Q-1) >> 8) % Q;
-  signal f_s : unsigned(31 downto 0) := x"0000A3FA";
-
 
 begin
 
@@ -124,7 +107,24 @@ begin
   end process;
 
   
-  combinatorial : process (ram_out.q_a, ram_out.q_b, offset, montgomeryReducerOut_s, address, state_s, zeta, NTT_INTT_Select, INTT_data_a_s, INTT_data_b_s, montgomeryReducerOut_INTT_a_s, montgomeryReducerOut_INTT_b_s)
+  combinatorial : process (ram_out.q_a, ram_out.q_b, offset, montgomeryReducerOut_s, address, state_s, zeta, NTT_INTT_Select, montgomeryReducerOut_INTT_a_s, montgomeryReducerOut_INTT_b_s)
+  
+  --2*Q
+  variable Q2_v : unsigned(31 downto 0) := x"00FFC002";
+
+  --256*Q
+  variable Q256_v : unsigned(31 downto 0) := x"7FE00100";
+
+  --(MONT*MONT % Q) * (Q-1) % Q) * ((Q-1) >> 8) % Q;
+  variable f_v : unsigned(31 downto 0) := x"0000A3FA";
+  
+  variable temp1_v : unsigned(31 downto 0);
+  variable temp2_v : unsigned(31 downto 0);
+  variable temp3_v : unsigned(63 downto 0);
+
+  variable INTT_data_a_v  : unsigned(31 downto 0);
+  variable INTT_data_b_v  : unsigned(31 downto 0);
+  
   begin
 
     --Declare incremented address values
@@ -138,31 +138,42 @@ begin
 
         --Calculate p[j] and p[j+len]
         ram_in.data_a <= std_logic_vector(unsigned(ram_out.q_a) + montgomeryReducerOut_s);        --p[j]
-        ram_in.data_b <= std_logic_vector(unsigned(ram_out.q_a) + Q2_s - montgomeryReducerOut_s);  --p[j+len]
+        ram_in.data_b <= std_logic_vector(unsigned(ram_out.q_a) + Q2_v - montgomeryReducerOut_s);  --p[j+len]
+
+        --Defaults for INTT
+        montgomeryReducerIn_INTT_a_s <= (others => '0');
+        montgomeryReducerIn_INTT_b_s <= (others => '0');
+        INTT_data_a_v := (others => '0');
+        INTT_data_b_v := (others => '0');
+        temp1_v := (others => '0');
+        temp2_v := (others => '0');
+        temp3_v := (others => '0');
 
       when '1' => --INTT
         --Calculate Montgomery as soon as memory is ready
-        temp1 <= (unsigned(ram_out.q_a) + Q256_s - unsigned(ram_out.q_b));
-        temp2 <= unsigned(zeta);
-        temp3 <= temp1 * temp2;
-        --temp <= (unsigned(zeta) * (unsigned(ram_out.q_a) + Q256_s - unsigned(ram_out.q_b)));
-        montgomeryReducerIn_s <= temp3;
+        temp1_v := (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b));
+        temp2_v := unsigned(zeta);
+        temp3_v := temp1_v * temp2_v;
+        --temp <= (unsigned(zeta) * (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b)));
+        montgomeryReducerIn_s <= temp3_v;
 
         --Calculate p[j] and p[j+len]
-        INTT_data_a_s <= unsigned(ram_out.q_a) + unsigned(ram_out.q_b);     --p[j]
+        INTT_data_a_v := unsigned(ram_out.q_a) + unsigned(ram_out.q_b);     --p[j]
 
-        INTT_data_b_s <= montgomeryReducerOut_s;                           --p[j+len]
+        INTT_data_b_v := montgomeryReducerOut_s;                           --p[j+len]
 
         if(offset = x"80") then                 --Check if the INTT is in its last iteration, if so add additional montgomery factor
-          montgomeryReducerIn_INTT_a_s <= INTT_data_a_s * f_s;
-          montgomeryReducerIn_INTT_b_s <= INTT_data_b_s * f_s;
+          montgomeryReducerIn_INTT_a_s <= INTT_data_a_v * f_v;
+          montgomeryReducerIn_INTT_b_s <= INTT_data_b_v * f_v;
           ram_in.data_a <= std_logic_vector(montgomeryReducerOut_INTT_a_s);
           ram_in.data_b <= std_logic_vector(montgomeryReducerOut_INTT_b_s);
         else                                   --Otherwise operate as normal
-          ram_in.data_a <= std_logic_vector(INTT_data_a_s);
-          ram_in.data_b <= std_logic_vector(INTT_data_b_s);
+          montgomeryReducerIn_INTT_a_s <= (others => '0');
+          montgomeryReducerIn_INTT_b_s <= (others => '0');
+          ram_in.data_a <= std_logic_vector(INTT_data_a_v);
+          ram_in.data_b <= std_logic_vector(INTT_data_b_v);
         end if;
-      when others =>    --default (error saying 2/9 cases are covered, why?)
+      when others => null;   --default
     end case;     
 
     --Set write enable to high in writeback
