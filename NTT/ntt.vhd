@@ -104,28 +104,14 @@ begin
           ram_in  => ram_in_butterfly_s
     );
 
-  -- sequential : process(clk)
-
-  -- begin
-  --   if(rising_edge(clk)) then
-  --     --Planning
-  --     --Enable / Reset / Registered state?
-  --     --need to register butterfly IO
-  --     if(reset = '1') then
-  --       --Send reset signal to comb code?
-
-  --     elsif(enable = '1') then
-  --       --Send enalbe signal to comb code?
-
-  --     else
-  --       --??
-  --     end if;
-
-  --     --regester signals
 
 
-  --   end if;
-  -- end process;
+    --sequential block
+      --Register butterfly I/O?
+      --Register Mode
+      --Register enable/reset
+      --Register
+
 
   combinatorial : process (offset_s, offset_next_s, start_s, start_next_s, 
     address_s, address_next_s, mode_s, enable, reset, ntt_done_s, NTT_INTT_Select,
@@ -176,7 +162,9 @@ begin
             mode_s <= INTT;
             butterfly_NTT_INTT_Select_s <= '1';
             ntt_ready <= '0';
-          when others => mode_s <= waiting; ntt_ready <= '1';
+          when others =>
+            mode_s <= waiting;
+            ntt_ready <= '1';
         end case;
 
       --Main Block
