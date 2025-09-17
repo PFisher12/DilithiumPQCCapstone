@@ -14,7 +14,6 @@ architecture RTL of testbench is
     signal clk_s    : std_logic := '0';
 
     signal enable_NTT_s : std_logic := '0';
-    signal reset_NTT_s  : std_logic := '1';
     signal NTT_INTT_Select_s : std_logic := '0';
     signal ntt_ready_s   : std_logic;
 
@@ -34,7 +33,6 @@ begin
                 --Inputs
                 clk => clk_s,
                 enable_NTT => enable_NTT_s,
-                reset_NTT => reset_NTT_s,
                 NTT_INTT_Select => NTT_INTT_Select_s,
                 ramSelect => ramSelect_s,
                 --Outputs
@@ -52,7 +50,6 @@ begin
         selectTBCmds_s <= '0';           --Previous Commands if needed
      
         NTT_INTT_Select_s <= '0';        --Select the NTT
-        reset_NTT_s <= '0';     
         enable_NTT_s <= '1';             --Start the NTT
      
         wait for 80 ns;     

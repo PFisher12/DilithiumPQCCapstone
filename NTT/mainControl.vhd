@@ -12,7 +12,6 @@ entity mainControl is
     selectTBCmds    : in std_logic;
     ram_in_from_TB  : in RAM_IN;
     enable_NTT      : in std_logic;
-    reset_NTT       : in std_logic;
     NTT_INTT_Select : in std_logic;
     ramSelect       : in std_logic_vector (1 downto 0);
     ntt_ready       : out std_logic
@@ -50,7 +49,6 @@ begin
           --Inputs
           clk     => clk,
           enable  => enable_NTT,
-          reset   => reset_NTT,
           NTT_INTT_Select => NTT_INTT_Select,
           ntt_ready => ntt_ready,
 

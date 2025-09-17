@@ -12,10 +12,9 @@ entity ntt is
         --Inputs
         clk    : in std_logic;
         enable : in std_logic;
-        reset  : in std_logic;
         NTT_INTT_Select : in std_logic;
         --Outputs
-        ntt_ready : out std_logic;
+        ntt_ready : out std_logic := '0';
 
     --RAM I/O
         --Inputs
@@ -29,32 +28,21 @@ end ntt;
 architecture RTL of ntt is
 
   --Butterfly Vars
-  signal ram_in_butterfly_s       : RAM_IN;
-  signal butterfly_done_s         : std_logic := '0';
-  signal butterfly_enable_s       : std_logic := '0';
-  signal butterfly_NTT_INTT_Select_s     : std_logic := '0';
+  signal butterfly_NTT_INTT_Select_s  : std_logic := '0';
 
   --State Machine Vars
-  signal address_s                : std_logic_vector(7 downto 0) := "00000000";  --Current location of NTT, equiv to j variable in C
-  signal address_next_s           : std_logic_vector(7 downto 0) := "00000000";
-  signal offset_s                 : std_logic_vector(7 downto 0) := "10000000";  --8 bit offset, equiv to len variable in C
-  signal offset_next_s            : std_logic_vector(7 downto 0) := "10000000";
-  signal start_s                  : std_logic_vector(7 downto 0) := "00000000";  --Equiv to start var in C
-  signal start_next_s             : std_logic_vector(8 downto 0) := "000000000"; --Extra carry bit is needed for proper incrementation
-  signal ntt_done_s               : std_logic := '0';
+  signal address_s, address_next_s    : std_logic_vector(7 downto 0) := "00000000";  --Current location of NTT, equiv to j variable in C
+  signal offset_s, offset_next_s      : std_logic_vector(7 downto 0) := "10000000";  --8 bit offset, equiv to len variable in C
+  signal start_s                      : std_logic_vector(7 downto 0) := "00000000";  --Equiv to start var in C
+  signal start_next_s                 : std_logic_vector(8 downto 0) := "000000000"; --Extra carry bit is needed for proper incrementation
 
   --Zeta Vars
-  signal zeta_address_s           : std_logic_vector(7 downto 0) := "00000001";
-  signal zeta_forward_s           : std_logic_vector(31 downto 0); --zeta input (size is diff from code)
-  signal zeta_inverse_s           : std_logic_vector(31 downto 0); --zeta input (size is diff from code)
-  signal zeta_butterfly_s         : std_logic_vector(31 downto 0);
+  signal zeta_address_s                                     : std_logic_vector(7 downto 0) := "00000001";
+  signal zeta_forward_s, zeta_inverse_s, zeta_butterfly_s   : std_logic_vector(31 downto 0) := (others => '0'); --zeta input (size is diff from code);
 
   --State Machine Vars
-  type state is (len, start, j);
-  signal state_s : state := j;
-
-  type direction is (up, down);
-  signal direction_s : direction := down;
+  type state is (readRAM, writeRAM);
+  signal state_s : state := readRAM;
 
   type mode is (waiting, NTT, INTT);
   signal mode_s : mode := waiting;
@@ -89,178 +77,124 @@ begin
     (
       --Control I/O
           --Inputs
-          clk     => clk,
-          enable  => butterfly_enable_s,
           address => address_s,
           offset  => offset_s,
           zeta    => zeta_butterfly_s,
           NTT_INTT_Select => butterfly_NTT_INTT_Select_s,
-          --Outputs
-          butterfly_done    => butterfly_done_s,
       --RAM I/O
           --Inputs
           ram_out => ram_out_ntt,
           --Outputs
-          ram_in  => ram_in_butterfly_s
+          address_a => ram_in_ntt.address_a,
+          address_b => ram_in_ntt.address_b,
+          data_a    => ram_in_ntt.data_a,
+          data_b    => ram_in_ntt.data_b
     );
 
 
-
-    --sequential block
-      --Register butterfly I/O?
-      --Register Mode
-      --Register enable/reset
-      --Register
-
-
-  combinatorial : process (offset_s, offset_next_s, start_s, start_next_s, 
-    address_s, address_next_s, mode_s, enable, reset, ntt_done_s, NTT_INTT_Select,
-    state_s, direction_s, butterfly_done_s, ram_in_butterfly_s, zeta_forward_s, zeta_address_s, zeta_inverse_s)
+  sequential : process (clk)
 
   begin
+    if(clk'event and clk = '1') then
+      --NTT/INTT on
+      if(mode_s /= waiting) then
 
-    --Reset Block
-    if((ntt_done_s = '1') or (reset = '1')) then
-
-      --Control / State machine Variables
-      mode_s          <= waiting;
-      ntt_done_s      <= '0';
-      state_s         <= j;
-      direction_s     <= down;
-      butterfly_enable_s <= '0';
-
-      --Indexing Variables
-      case NTT_INTT_Select is
-        when '0' =>     --NTT
-          offset_s        <= x"80";
-          offset_next_s   <= x"80";
-          zeta_address_s  <= x"01";
-          zeta_butterfly_s <= zeta_forward_s;
-        when '1' =>     --INTT
-          offset_s        <= x"01";
-          offset_next_s   <= x"01";
-          zeta_address_s  <= x"00";
-          zeta_butterfly_s <= zeta_inverse_s;
-        when others => null; --Error Case
-      end case;
-
-      start_s         <= x"00";
-      start_next_s    <= (others => '0');
-      address_s       <= x"00";
-      address_next_s  <= x"00";
-
-    else
-
-      --NTT / INTT Select Block
-      if(mode_s = waiting and enable = '1') then
-        case NTT_INTT_Select is
-          when '0' => 
-            mode_s <= NTT;
-            butterfly_NTT_INTT_Select_s <= '0';
-            ntt_ready <= '0';
-          when '1' => 
-            mode_s <= INTT;
-            butterfly_NTT_INTT_Select_s <= '1';
-            ntt_ready <= '0';
-          when others =>
-            mode_s <= waiting;
-            ntt_ready <= '1';
-        end case;
-
-      --Main Block
-      elsif(mode_s /= waiting) then
-
-        ntt_ready <= '0';
-        butterfly_enable_s <= '1';
-
-        --Precalculate next values to preemt state changes
         case mode_s is
-          when NTT => offset_next_s <= std_logic_vector(shift_right(unsigned(offset_s), 1)); zeta_butterfly_s <= zeta_forward_s;  --NTT
-          when INTT => offset_next_s <= std_logic_vector(shift_left(unsigned(offset_s), 1)); zeta_butterfly_s <= zeta_inverse_s;  --INTT
-          when others => offset_next_s <= (others => '0'); --error case
+          when NTT => mode_s <= NTT;
+          when INTT => mode_s <= INTT;
+          when others => mode_s <= waiting; --error case
         end case;
-        start_next_s <= std_logic_vector(('0' & unsigned(address_s) + unsigned(offset_s)) + 1);
-        address_next_s <= std_logic_vector(unsigned(address_s) + 1);
 
-      --Tri state state machine to properly index to all necessary addresses 
-      --needed to perform the butterfly in the correct order with the proper 
-      --twiddle factors included
-        case state_s is
-          --Offset loop
-          when len =>
-            case direction_s is
-              when up =>
-                if (offset_next_s /= x"00") then
-                  --Increment to next len state
-                  offset_s <= offset_next_s;
-                  direction_s <= down;
-                else
-                  --NTT Done, update done signal
-                  ntt_done_s <= '1';
-                end if;
-              when down =>
-                --Goto start loop
-                start_s  <= x"00";
-                state_s <= start;
-              when others => null; --error case
-            end case;
-              
-          --start loop
-          when start =>
-              case direction_s is
-                when up =>
-                  --Check if it has reached its max value
-                  if (start_next_s(8) /= '1') then
-                    start_s <= start_next_s(7 downto 0);
-                    direction_s <= down;
-                  else
-                    state_s <= len;
-                  end if;
-                when down =>
-                  --Make current start value the input address of the butterfly
-                  address_s <= start_s;
-                  --increment zeta_s
-                  zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
-                  --Goto J
-                  state_s <= j;
-                when others => null; --error case
-              end case;          
+        --Calculate next butterfly values when the butterfly is done
+        if(state_s = writeRAM) then
+          state_s <= readRAM;
+          if (address_next_s /= std_logic_vector(unsigned(start_s) + unsigned(offset_s))) then
+            address_s  <= address_next_s;
+          --start check
+          elsif(start_next_s(8) /= '1') then
+            start_s <= start_next_s(7 downto 0);
+            address_s  <= start_next_s(7 downto 0);
+            zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
+          --len check
+          elsif(offset_next_s /= x"00") then
+            offset_s <= offset_next_s;
+            start_s  <= x"00";
+            address_s  <= x"00";
+            zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
+          else
+            mode_s <= waiting;
+          end if; --j check
+        else
+          state_s <= writeRAM;
+        end if;
 
-          --J loop
-          when j =>
-            case direction_s is
-              when up =>
-                --Increment the innermost loops
-                --Check if it has reached its max value
-                if (address_next_s /= std_logic_vector(unsigned(start_s) + unsigned(offset_s))) then
-                  --If not, continue the increment
-                  address_s <= address_next_s;
-                  direction_s <= down;
-                else
-                  --If so, change states
-                  state_s <= start;
-                end if;
-              when down =>
-                --After butterfly, set direction to up
-                  if(((ram_in_butterfly_s.wren_a nor ram_in_butterfly_s.wren_b) = '0') and (butterfly_done_s = '1')) then  --check for rising edge of butterfly finishing AND the falling edge of the write enables
-                    --Select butterfly up or down
-                    direction_s <= up;
-                  else
-                    null; --error case
-                  end if;
-              when others => null; --error case
-            end case;
-          when others => null; --error case
-        end case;
+      --NTT/INTT Select Block
       else
+        state_s <= readRAM;
+        case NTT_INTT_Select is
+          when '0' =>     --NTT
+            offset_s        <= x"80";
+            zeta_address_s  <= x"01";
+          when '1' =>     --INTT
+            offset_s        <= x"01";
+            zeta_address_s  <= x"00";
+          when others =>  --Error Case
+            offset_s        <= x"80";
+            zeta_address_s  <= x"01";
+        end case;
+        start_s         <= x"00";
+        address_s       <= x"00";
+        --Select NTT/INTT if the module is enabled
+        if(enable = '1') then
+          case NTT_INTT_Select is
+            when '0' => 
+              mode_s <= NTT;
+            when '1' => 
+              mode_s <= INTT;
+            when others =>  --Error case
+              mode_s <= waiting;
+          end case;
+        else --NTT disabled
+          mode_s <= waiting;
+        end if; --Enable if
+      end if; --mode check if
+    end if; --clk event if
+  end process;
+
+  combinatorial: process(mode_s, state_s, offset_s, address_s, zeta_forward_s, zeta_inverse_s) 
+  begin
+    --Precalculate next values to preemt state changes
+    case mode_s is
+      when NTT =>
+        offset_next_s <= std_logic_vector(shift_right(unsigned(offset_s), 1));
+        zeta_butterfly_s <= zeta_forward_s;
+        ntt_ready <= '0';
+        butterfly_NTT_INTT_Select_s <= '0';
+      when INTT =>
+        offset_next_s <= std_logic_vector(shift_left(unsigned(offset_s), 1));
+        zeta_butterfly_s <= zeta_inverse_s;
+        ntt_ready <= '0';
+        butterfly_NTT_INTT_Select_s <= '1';
+      when others =>
+        offset_next_s <= std_logic_vector(shift_right(unsigned(offset_s), 1));
+        zeta_butterfly_s <= zeta_forward_s;
         ntt_ready <= '1';
-      end if;
+        butterfly_NTT_INTT_Select_s <= '0';
+    end case;
+    start_next_s <= std_logic_vector(('0' & unsigned(address_s) + unsigned(offset_s)) + 1);
+    address_next_s <= std_logic_vector(unsigned(address_s) + 1);
+
+    if(state_s = writeRAM) then
+      ram_in_ntt.wren_a <= '1';
+      ram_in_ntt.wren_b <= '1';
+    else 
+      ram_in_ntt.wren_a <= '0';
+      ram_in_ntt.wren_b <= '0';
     end if;
 
 
+        
   end process;
-
-  ram_in_ntt <= ram_in_butterfly_s;
 
 
 end RTL;
