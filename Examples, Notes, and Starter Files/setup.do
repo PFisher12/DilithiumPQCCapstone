@@ -54,18 +54,16 @@ if { [file exists $project_directory/DilithiumSim.mpf] } {
 #======================================
 #Project Add VHDL Files
 #======================================
-#(SET MANUALLY)#
 #Add new VHDL files to this list
-project addfile $VHDL_directory/GlobalVars.vhd
-project addfile $VHDL_directory/ZetaForwardROM.vhd
-project addfile $VHDL_directory/ZetaInverseROM.vhd
-project addfile $VHDL_directory/MontgomeryReducer.vhd
-project addfile $VHDL_directory/butterfly.vhd
-project addfile $VHDL_directory/ntt.vhd
-project addfile $VHDL_directory/ram.vhd
-project addfile $VHDL_directory/ramControl.vhd
-project addfile $VHDL_directory/mainControl.vhd
-project addfile $VHDL_directory/Testbench.vhd
+
+
+# Get the list of all files in the directory
+set file_list [glob -nocomplain -directory $VHDL_directory *]
+
+# Loop through each file and add it to the project
+foreach file $file_list {
+    project addfile $file
+}
 
 #Calculates the proper order if above files are in an incorrect order, uncomment for debugging
 #project calculateorder
@@ -73,19 +71,6 @@ project addfile $VHDL_directory/Testbench.vhd
 #======================================
 #Project Compilation and Simulation
 #======================================
-
-#Compiles all files
-
-#VHDL 2008
-#set files [project filenames]
-#foreach file $files {
-#    if {[string match "*.vhd" $file] || [string match "*.vhdl" $file]} {
-#        puts "Compiling $file with VHDL-2008"
-#        vcom -2008 $file
-#    }
-#}
-
-#or
 
 #VHDL 2002
 project compileall
@@ -104,5 +89,5 @@ if { [file exists $project_directory/wave.do] } {
 log * -r
 
 #Start the sim
-run 50 us
+run 0.1 ms
 #run -all
