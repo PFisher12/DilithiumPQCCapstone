@@ -31,8 +31,8 @@ architecture RTL of bramTwoPort is
   subtype word_t is std_logic_vector(width - 1 downto 0);
   type memory_t is array(0 to 2**depth-1) of word_t;
 
-  --signal ram : memory_t := (others => (others => '0'));
-  signal ram : memory_t := (
+  --shared variable ram : memory_t := (others => (others => '0'));
+  shared variable ram : memory_t := (
     0 => x"006AAF4A",
     1 => x"000BC8BA",
     2 => x"004A1708",
@@ -290,25 +290,35 @@ architecture RTL of bramTwoPort is
     254 => x"0046E9FB",
     255 => x"006419C6");
 
-begin
-  sequential : process(clk)
-  begin
-    if (rising_edge(clk)) then
 
+begin
+
+  
+
+  sequential1 : process(clk)
+  begin
+    if (clk'event and clk = '1') then
       --Write Logic
       if(wren_a = '1') then
-        ram(to_integer(unsigned(address_a))) <= data_a;
+        ram(to_integer(unsigned(address_a))) := data_a;
       end if;
-
-      if(wren_b = '1') then
-        ram(to_integer(unsigned(address_b))) <= data_b;
-      end if;
-
       --Read Logic
       q_a <= ram(to_integer(unsigned(address_a)));
-      q_b <= ram(to_integer(unsigned(address_b)));
-
     end if;
   end process;
+
+
+  sequential2 : process(clk)
+  begin
+    if (clk'event and clk = '1') then
+      --Write Logic
+      if(wren_b = '1') then
+        ram(to_integer(unsigned(address_b))) := data_b;
+      end if;
+      --Read Logic
+      q_b <= ram(to_integer(unsigned(address_b)));
+    end if;
+  end process;
+
 
 end RTL;
