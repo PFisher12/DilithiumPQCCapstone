@@ -56,7 +56,7 @@ begin
 
 
   
-  combinatorial : process (ram_out.q_a, ram_out.q_b, offset, address, zeta, NTT_INTT_Select, montgomeryReducerOut_s)
+  combinatorial : process (ram_out.q_a, ram_out.q_b, offset, address, zeta, NTT_INTT_Select, montgomeryReducerOut_s, MONT_Mode)
   
   --2*Q
   constant Q2_v : unsigned(31 downto 0) := x"00FFC002";
