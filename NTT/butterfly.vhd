@@ -20,6 +20,7 @@ entity butterfly is
         offset          : in std_logic_vector(7 downto 0); --8 bit offset, equiv to len variable in C
         zeta            : in std_logic_vector(31 downto 0); --zeta input (size is diff from code)
         NTT_INTT_Select : in std_logic;
+        MONT_Mode       : in std_logic;
 
     --RAM I/O
         --Inputs
@@ -39,10 +40,6 @@ architecture RTL of butterfly is
   --Montgom Signals
   signal montgomeryReducerIn_s  : unsigned(63 downto 0); --Input to montgomery reducer
   signal montgomeryReducerOut_s : unsigned(31 downto 0); --Output of montgomery reduction fn, equiv to variable t in C-
-  signal montgomeryReducerIn_INTT_a_s   : unsigned (63 downto 0);
-  signal montgomeryReducerIn_INTT_b_s   : unsigned (63 downto 0);
-  signal montgomeryReducerOut_INTT_a_s  : unsigned (31 downto 0);
-  signal montgomeryReducerOut_INTT_b_s  : unsigned (31 downto 0);
 
 begin
 
@@ -57,29 +54,9 @@ begin
           t => montgomeryReducerOut_s
     );
 
-  --Add two addition Montgomery Reducers for final INTT loop
-  INTTMontgomeryReducer_a : entity work.MontgomeryReducer(RTL)
-    port map
-    (
-      --Data I/O
-          --Inputs
-          a => montgomeryReducerIn_INTT_a_s,
-          --Outputs
-          t => montgomeryReducerOut_INTT_a_s
-    );
-
-  INTTMontgomeryReducer_b : entity work.MontgomeryReducer(RTL)
-    port map
-    (
-      --Data I/O
-          --Inputs
-          a => montgomeryReducerIn_INTT_b_s,
-          --Outputs
-          t => montgomeryReducerOut_INTT_b_s
-    );
 
   
-  combinatorial : process (ram_out.q_a, ram_out.q_b, offset, address, zeta, NTT_INTT_Select, montgomeryReducerOut_s, montgomeryReducerOut_INTT_a_s, montgomeryReducerOut_INTT_b_s)
+  combinatorial : process (ram_out.q_a, ram_out.q_b, offset, address, zeta, NTT_INTT_Select, montgomeryReducerOut_s)
   
   --2*Q
   constant Q2_v : unsigned(31 downto 0) := x"00FFC002";
@@ -100,32 +77,32 @@ begin
       when '0' => --NTT
         --Calculate Montgomery as soon as memory is ready
         montgomeryReducerIn_s <= unsigned(zeta) * unsigned(ram_out.q_b);
-        montgomeryReducerIn_INTT_a_s <= (others => '0');
-        montgomeryReducerIn_INTT_b_s <= (others => '0');
 
         --Calculate p[j] and p[j+len]
         data_a <= std_logic_vector(unsigned(ram_out.q_a) + montgomeryReducerOut_s);         --p[j]
         data_b <= std_logic_vector(unsigned(ram_out.q_a) + Q2_v - montgomeryReducerOut_s);  --p[j+len]
 
       when '1' => --INTT
-        --Calculate Montgomery as soon as memory is ready
-        montgomeryReducerIn_s <= (unsigned(zeta) * (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b)));
-        montgomeryReducerIn_INTT_a_s <= (unsigned(ram_out.q_a) + unsigned(ram_out.q_b)) * f_v;
-        montgomeryReducerIn_INTT_b_s <= montgomeryReducerOut_s * f_v;
+        case MONT_Mode is
+          when '0' =>
+            --Calculate Montgomery as soon as memory is ready
+            montgomeryReducerIn_s <= (unsigned(zeta) * (unsigned(ram_out.q_a) + Q256_v - unsigned(ram_out.q_b)));
 
-        if(offset = x"80") then
-          --Check if the INTT is in its last iteration, if so add additional montgomery factor
-          data_a <= std_logic_vector(montgomeryReducerOut_INTT_a_s);
-          data_b <= std_logic_vector(montgomeryReducerOut_INTT_b_s);
-        else
-          --Otherwise operate as normal and calculate p[j] and p[j+len]
-          data_a <= std_logic_vector(unsigned(ram_out.q_a) + unsigned(ram_out.q_b));
-          data_b <= std_logic_vector(montgomeryReducerOut_s);
-        end if;
+            --Otherwise operate as normal and calculate p[j] and p[j+len]
+            data_a <= std_logic_vector(unsigned(ram_out.q_a) + unsigned(ram_out.q_b));
+            data_b <= std_logic_vector(montgomeryReducerOut_s);
+          when '1' =>
+            montgomeryReducerIn_s <= unsigned(ram_out.q_a) * f_v;
+
+            data_a <= std_logic_vector(montgomeryReducerOut_s);
+            data_b <= (others => '0');
+          when others =>     --error case
+            montgomeryReducerIn_s <= (others => '0');
+            data_a <= (others => '0');
+            data_b <= (others => '0');
+        end case;
       when others =>     --error case
         montgomeryReducerIn_s <= (others => '0');
-        montgomeryReducerIn_INTT_a_s <= (others => '0');
-        montgomeryReducerIn_INTT_b_s <= (others => '0');
         data_a <= (others => '0');
         data_b <= (others => '0');
     end case;     

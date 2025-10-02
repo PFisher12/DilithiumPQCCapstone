@@ -29,6 +29,8 @@ architecture RTL of ntt is
 
   --Butterfly Vars
   signal butterfly_NTT_INTT_Select_s  : std_logic := '0';
+  signal MONT_Mode_s                  : std_logic := '0';
+  signal ram_out_ntt_s                : RAM_OUT := RAM_OUT_INITIALIZE;
 
   --State Machine Vars
   signal address_s, address_next_s    : std_logic_vector(7 downto 0) := "00000000";  --Current location of NTT, equiv to j variable in C
@@ -41,8 +43,8 @@ architecture RTL of ntt is
   signal zeta_forward_s, zeta_inverse_s, zeta_butterfly_s   : std_logic_vector(31 downto 0) := (others => '0'); --zeta input (size is diff from code);
 
   --State Machine Vars
-  type state is (readRAM, writeRAM);
-  signal state_s : state := readRAM;
+  type state is (readDualPort, writeDualPort, writeSinglePort);
+  signal state_s : state := readDualPort;
 
   type mode is (waiting, NTT, INTT);
   signal mode_s : mode := waiting;
@@ -81,9 +83,10 @@ begin
           offset  => offset_s,
           zeta    => zeta_butterfly_s,
           NTT_INTT_Select => butterfly_NTT_INTT_Select_s,
+          MONT_Mode => MONT_Mode_s,
       --RAM I/O
           --Inputs
-          ram_out => ram_out_ntt,
+          ram_out => ram_out_ntt_s,
           --Outputs
           address_a => ram_in_ntt.address_a,
           address_b => ram_in_ntt.address_b,
@@ -98,16 +101,9 @@ begin
     if(clk'event and clk = '1') then
       --NTT/INTT on
       if(mode_s /= waiting) then
-
-        case mode_s is
-          when NTT => mode_s <= NTT;
-          when INTT => mode_s <= INTT;
-          when others => mode_s <= waiting; --error case
-        end case;
-
         --Calculate next butterfly values when the butterfly is done
-        if(state_s = writeRAM) then
-          state_s <= readRAM;
+        if(state_s = writeDualPort) then
+          state_s <= readDualPort;
           if (address_next_s /= std_logic_vector(unsigned(start_s) + unsigned(offset_s))) then
             address_s  <= address_next_s;
           --start check
@@ -121,16 +117,45 @@ begin
             start_s  <= x"00";
             address_s  <= x"00";
             zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
+          --INTT Done but still needs montgomery run through
+          elsif(mode_s = INTT) then
+            --state_s <= writeSinglePort;
+            state_s <= readDualPort;
+            MONT_Mode_s <= '1';
+            address_s  <= x"00";
+            start_s  <= x"00";
+            offset_s <= x"00";
+            zeta_address_s <= x"00";
           else
             mode_s <= waiting;
           end if; --j check
+        --Montgomery Runthrough
+        elsif(state_s = writeSinglePort) then
+          --Increment montgomery addressing
+          address_s  <= address_next_s;
+
+          --Check for finish conditions
+          if(address_next_s = x"00") then
+            mode_s <= waiting;
+            state_s <= readDualPort;
+            MONT_Mode_s <= '0';
+          end if;
+
         else
-          state_s <= writeRAM;
+          case MONT_Mode_s is
+            when '0' =>
+              state_s <= writeDualPort;
+            when '1' =>
+              offset_s <= x"01";
+              state_s <= writeSinglePort;
+            when others => --error case
+              state_s <= readDualPort;
+          end case;
         end if;
 
       --NTT/INTT Select Block
       else
-        state_s <= readRAM;
+        state_s <= readDualPort;
         case NTT_INTT_Select is
           when '0' =>     --NTT
             offset_s        <= x"80";
@@ -144,6 +169,7 @@ begin
         end case;
         start_s         <= x"00";
         address_s       <= x"00";
+        MONT_Mode_s     <= '0';
         --Select NTT/INTT if the module is enabled
         if(enable = '1') then
           case NTT_INTT_Select is
@@ -161,7 +187,7 @@ begin
     end if; --clk event if
   end process;
 
-  combinatorial: process(mode_s, state_s, offset_s, address_s, zeta_forward_s, zeta_inverse_s) 
+  combinatorial: process(mode_s, state_s, offset_s, address_s, zeta_forward_s, zeta_inverse_s, ram_out_ntt) 
   begin
     --Precalculate next values to preemt state changes
     case mode_s is
@@ -184,13 +210,21 @@ begin
     start_next_s <= std_logic_vector(('0' & unsigned(address_s) + unsigned(offset_s)) + 1);
     address_next_s <= std_logic_vector(unsigned(address_s) + 1);
 
-    if(state_s = writeRAM) then
-      ram_in_ntt.wren_a <= '1';
-      ram_in_ntt.wren_b <= '1';
-    else 
-      ram_in_ntt.wren_a <= '0';
-      ram_in_ntt.wren_b <= '0';
-    end if;
+    case state_s is
+      when writeDualPort => 
+        ram_in_ntt.wren_a <= '1';
+        ram_in_ntt.wren_b <= '1';
+        ram_out_ntt_s <= ram_out_ntt;
+      when writeSinglePort =>
+        ram_in_ntt.wren_a <= '1';
+        ram_in_ntt.wren_b <= '0';
+        ram_out_ntt_s.q_a <= ram_out_ntt.q_b;
+        ram_out_ntt_s.q_b <= (others => '0');
+      when others =>
+        ram_in_ntt.wren_a <= '0';
+        ram_in_ntt.wren_b <= '0';
+        ram_out_ntt_s <= ram_out_ntt;
+     end case;
 
 
         
