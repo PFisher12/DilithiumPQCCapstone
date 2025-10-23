@@ -5,14 +5,9 @@ vmap work work
 # ============================================================
 # Compile VHDL sources (adjust paths if needed)
 # ============================================================
-vcom ./globalVars.vhd
-vcom ./rejEta.vhd
-vcom ./rejEta_tb.vhd
+vcom "C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/globalVars.vhd"
+vcom "C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd"
 
-# ============================================================
-# Load testbench
-# ============================================================
-vsim work.rejEta_tb
 
 # ============================================================
 # Add waveform signals

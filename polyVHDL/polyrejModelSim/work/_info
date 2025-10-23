@@ -13,80 +13,77 @@ Pglobalvars
 Z0 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
 Z1 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
 Z2 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
-!i122 11
+!i122 17
 w1761224252
 Z3 dC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyrejModelSim
-8C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/Tail Module/GlobalVars.vhd
-FC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/Tail Module/GlobalVars.vhd
+8C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/globalVars.vhd
+FC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/globalVars.vhd
 l0
 L5 1
-V=ESL];NQgG6P7[`aWz[7o2
+Vie8V?QK8fcUbg3SJVJHU53
 !s100 81F]9[?61YBR9^>c=YijT2
 Z4 OV;C;2020.1;71
 32
-Z5 !s110 1761224594
+Z5 !s110 1761225202
 !i10b 1
-Z6 !s108 1761224594.000000
-!s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/Tail Module/GlobalVars.vhd|
-!s107 C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/Tail Module/GlobalVars.vhd|
+Z6 !s108 1761225202.000000
+!s90 -reportprogress|300|C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/globalVars.vhd|
+!s107 C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/globalVars.vhd|
 !i113 1
-Z7 o-work work -2002 -explicit
-Z8 tExplicit 1 CvgOpt 0
+Z7 tExplicit 1 CvgOpt 0
 Epolyvhdl
-Z9 w1761224591
-Z10 DPx4 work 10 globalvars 0 22 =ESL];NQgG6P7[`aWz[7o2
+Z8 w1761224975
 R0
 R1
 R2
-!i122 12
+!i122 18
 R3
-Z11 8C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd
-Z12 FC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd
+Z9 8C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd
+Z10 FC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd
 l0
 L52 1
-VUN32?W;@<A<f9^C5iIUPH1
-!s100 0_DMWTNCdON:8o7@j[3jb3
+VV?@W@mUUdNO]1F;2kfC3:3
+!s100 ?9lUYYjB;C6OjQIZMnSOB2
 R4
 32
 R5
 !i10b 1
 R6
-Z13 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd|
-Z14 !s107 C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd|
+!s90 -reportprogress|300|C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd|
+Z11 !s107 C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd|
 !i113 1
 R7
-R8
 Abehavioral
-R10
+Z12 DPx4 work 10 globalvars 0 22 =ESL];NQgG6P7[`aWz[7o2
 R0
 R1
 R2
 DEx4 work 8 polyvhdl 0 22 UN32?W;@<A<f9^C5iIUPH1
-!i122 12
+!i122 16
 l85
-L65 90
-Vi>fPQD_HnLTbe2[JI4nmT1
-!s100 QXbCeRHEJz62UI2TB]ZHB1
+L65 86
+VmjZCOVZIF9FHb56WNk`i;3
+!s100 zFeJ1C^O9ENfa1UCS]kmB1
 R4
 32
-R5
+!s110 1761224873
 !i10b 1
-R6
-R13
-R14
+!s108 1761224873.000000
+Z13 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd|
+R11
 !i113 1
+Z14 o-work work -2002 -explicit
 R7
-R8
 Erejeta
 w1761224403
-R10
+R12
 R0
 R1
 R2
 !i122 8
 R3
-R11
-R12
+R9
+R10
 l0
 L51 1
 VYMOZUMc0a`LCGIc2:TAN82
@@ -97,7 +94,7 @@ R4
 !i10b 1
 !s108 1761224407.000000
 R13
-R14
+R11
 !i113 1
+R14
 R7
-R8

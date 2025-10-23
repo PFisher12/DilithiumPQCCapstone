@@ -1,50 +1,123 @@
-# Compile of polyVHDL.vhd failed with 3 errors.
 # Compile of GlobalVars.vhd was successful.
-# Compile of polyVHDL.vhd failed with 5 errors.
-# 2 compiles, 1 failed with 5 errors.
-# Compile of GlobalVars.vhd was successful.
-# Compile of polyVHDL.vhd failed with 2 errors.
-# 2 compiles, 1 failed with 2 errors.
-# Compile of GlobalVars.vhd was successful.
-# Compile of polyVHDL.vhd failed with 1 errors.
-# 2 compiles, 1 failed with 1 error.
-# Compile of GlobalVars.vhd was successful.
-# Compile of polyVHDL.vhd failed with 2 errors.
-# 2 compiles, 1 failed with 2 errors.
-# Compile of GlobalVars.vhd was successful.
-# Compile of polyVHDL.vhd failed with 2 errors.
-# 2 compiles, 1 failed with 2 errors.
-# Compile of GlobalVars.vhd was successful.
-# Compile of polyVHDL.vhd failed with 4 errors.
-# 2 compiles, 1 failed with 4 errors.
+# Compile of polyVHDL.vhd was successful.
+# 2 compiles, 0 failed with no errors.
 # Compile of GlobalVars.vhd was successful.
 # Compile of polyVHDL.vhd was successful.
 # 2 compiles, 0 failed with no errors.
 vsim -gui work.polyvhdl
 # vsim -gui work.polyvhdl 
-# Start time: 09:03:37 on Oct 23,2025
+# Start time: 09:08:02 on Oct 23,2025
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
 # Loading ieee.numeric_std(body)
 # Loading work.globalvars
 # Loading work.polyvhdl(behavioral)
-do test.do
-# Cannot open macro file: test.do
 do ../test.do
 # ** Warning: (vlib-34) Library already exists at "work".
 # Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
 # vmap work work 
 # Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyrejModelSim/polyrejModelSim.mpf
 # Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
-# Start time: 09:04:43 on Oct 23,2025
+# Start time: 09:08:19 on Oct 23,2025
 # vcom -reportprogress 300 ./globalVars.vhd 
 # ** Error: (vcom-7) Failed to open design unit file "./globalVars.vhd" in read mode.
 # No such file or directory. (errno = ENOENT)
-# End time: 09:04:43 on Oct 23,2025, Elapsed time: 0:00:00
+# End time: 09:08:19 on Oct 23,2025, Elapsed time: 0:00:00
 # Errors: 1, Warnings: 0
 # ** Error: C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
 # Error in macro ./../test.do line 8
 # C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
 #     while executing
 # "vcom ./globalVars.vhd"
+do ../test.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyrejModelSim/polyrejModelSim.mpf
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 09:09:46 on Oct 23,2025
+# vcom -reportprogress 300 ./globalVars.vhd 
+# ** Error: (vcom-7) Failed to open design unit file "./globalVars.vhd" in read mode.
+# No such file or directory. (errno = ENOENT)
+# End time: 09:09:46 on Oct 23,2025, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# ** Error: C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+# Error in macro ./../test.do line 8
+# C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+#     while executing
+# "vcom ./globalVars.vhd"
+vcom polyVHDL.vhd
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 09:10:14 on Oct 23,2025
+# vcom -reportprogress 300 polyVHDL.vhd 
+# ** Error: (vcom-7) Failed to open design unit file "polyVHDL.vhd" in read mode.
+# No such file or directory. (errno = ENOENT)
+# End time: 09:10:14 on Oct 23,2025, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+do ../test.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyrejModelSim/polyrejModelSim.mpf
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 09:12:54 on Oct 23,2025
+# vcom -reportprogress 300 ./globalVars.vhd 
+# ** Error: (vcom-7) Failed to open design unit file "./globalVars.vhd" in read mode.
+# No such file or directory. (errno = ENOENT)
+# End time: 09:12:54 on Oct 23,2025, Elapsed time: 0:00:00
+# Errors: 1, Warnings: 0
+# ** Error: C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+# Error in macro ./../test.do line 8
+# C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+#     while executing
+# "vcom ./globalVars.vhd"
+do ../test.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyrejModelSim/polyrejModelSim.mpf
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 09:13:22 on Oct 23,2025
+# vcom -reportprogress 300 C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/globalVars.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling package globalVars
+# End time: 09:13:22 on Oct 23,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 09:13:22 on Oct 23,2025
+# vcom -reportprogress 300 C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity polyVHDL
+# -- Compiling architecture Behavioral of polyVHDL
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(120): (vcom-1136) Unknown identifier "Q".
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(120): (vcom-1590) Bad expression in left operand of infix expression '-'.
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(120): (vcom-1600) No feasible entries for subprogram "TO_UNSIGNED".
+#    Visible subprograms are:
+#       (explicit) NUMERIC_STD.TO_UNSIGNED[NATURAL, NATURAL return UNRESOLVED_UNSIGNED] at $MODEL_TECH/../vhdl_src/ieee/mti_numeric_std.vhd(1464)
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(124): (vcom-1136) Unknown identifier "N".
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(124): (vcom-1590) Bad expression in right operand of infix expression 'and'.
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(124): Type error resolving infix expression "and" as type std.STANDARD.BOOLEAN.
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(125): (vcom-1136) Unknown identifier "Q".
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(125): (vcom-1590) Bad expression in left operand of infix expression '-'.
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(125): (vcom-1600) No feasible entries for subprogram "TO_UNSIGNED".
+#    Visible subprograms are:
+#       (explicit) NUMERIC_STD.TO_UNSIGNED[NATURAL, NATURAL return UNRESOLVED_UNSIGNED] at $MODEL_TECH/../vhdl_src/ieee/mti_numeric_std.vhd(1464)
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(131): (vcom-1136) Unknown identifier "N".
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(131): (vcom-1590) Bad expression in right operand of infix expression '>='.
+# ** Error: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(131): Type error resolving infix expression ">=" as type std.STANDARD.BOOLEAN.
+# ** Note: C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd(150): VHDL Compiler exiting
+# End time: 09:13:22 on Oct 23,2025, Elapsed time: 0:00:00
+# Errors: 12, Warnings: 0
+# ** Error: C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+# Error in macro ./../test.do line 9
+# C:/intelFPGA_lite/20.1/modelsim_ase/win32aloem/vcom failed.
+#     while executing
+# "vcom "C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyVHDL.vhd""
