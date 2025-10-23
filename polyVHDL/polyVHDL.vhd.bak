@@ -143,6 +143,10 @@ begin
       end case;
     end if;
   end process;
+
+  -------------------------------------------------------------------
+  -- Output assignments
+  -------------------------------------------------------------------
   coeff_out   <= std_logic_vector(coeff_reg);
   coeff_valid <= coeff_valid_reg;
   done        <= done_reg;
