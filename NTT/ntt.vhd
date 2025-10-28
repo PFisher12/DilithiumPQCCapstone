@@ -1,9 +1,15 @@
+--NTT.vhd
+--This module acts as the top level module that connects the twiddle factors stored in ROM 
+--and butterfly module needed for the actual calculations. 
+--If enable is switched high whilst ready is active, the module will work until completion. 
+--NTT_INTT_Select selects either the forward NTT or inverse NTT computation. 0 = forward and 1 = inverse
+--No reset is used for now, though it may be added later if the design necissates one.
+
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.GlobalVars.all;
-
---Note: Either switch NTT/INTT mode before the current iteration finishes OR switch it after and manually reset the block
 
 entity ntt is
 
@@ -27,22 +33,22 @@ end ntt;
 
 architecture RTL of ntt is
 
-  --Butterfly Vars
+  --Butterfly Signals
   signal butterfly_NTT_INTT_Select_s  : std_logic := '0';
   signal MONT_Mode_s                  : std_logic := '0';
   signal ram_out_ntt_s                : RAM_OUT := RAM_OUT_INITIALIZE;
 
-  --State Machine Vars
+  --State Machine Signals
   signal address_s, address_next_s    : std_logic_vector(7 downto 0) := "00000000";  --Current location of NTT, equiv to j variable in C
   signal offset_s, offset_next_s      : std_logic_vector(7 downto 0) := "10000000";  --8 bit offset, equiv to len variable in C
   signal start_s                      : std_logic_vector(7 downto 0) := "00000000";  --Equiv to start var in C
   signal start_next_s                 : std_logic_vector(8 downto 0) := "000000000"; --Extra carry bit is needed for proper incrementation
 
-  --Zeta Vars
+  --Zeta Signals
   signal zeta_address_s                                     : std_logic_vector(7 downto 0) := "00000001";
   signal zeta_forward_s, zeta_inverse_s, zeta_butterfly_s   : std_logic_vector(31 downto 0) := (others => '0'); --zeta input (size is diff from code);
 
-  --State Machine Vars
+  --State Machine Signals
   type state is (readDualPort, writeDualPort, writeSinglePort);
   signal state_s : state := readDualPort;
 
@@ -52,6 +58,7 @@ architecture RTL of ntt is
 
 begin
 
+  --Instantiate the two ROMS with the precalculated twiddle factors
   zetaForwardRom : entity work.romForwardZetas(RTL)
     port map
     (
@@ -74,6 +81,7 @@ begin
           q       => zeta_inverse_s
     );
 
+  --Instantate the butterfly module and feed it all values needed for computation
   butterfly : entity work.butterfly(RTL)
     port map
     (
@@ -96,7 +104,6 @@ begin
 
 
   sequential : process (clk)
-
   begin
     if(clk'event and clk = '1') then
       --NTT/INTT on
@@ -210,6 +217,7 @@ begin
     start_next_s <= std_logic_vector(('0' & unsigned(address_s) + unsigned(offset_s)) + 1);
     address_next_s <= std_logic_vector(unsigned(address_s) + 1);
 
+    --Set the proper write enables based on the current state
     case state_s is
       when writeDualPort => 
         ram_in_ntt.wren_a <= '1';
@@ -225,8 +233,6 @@ begin
         ram_in_ntt.wren_b <= '0';
         ram_out_ntt_s <= ram_out_ntt;
      end case;
-
-
         
   end process;
 
