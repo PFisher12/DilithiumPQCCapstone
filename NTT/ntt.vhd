@@ -106,92 +106,97 @@ begin
   sequential : process (clk)
   begin
     if(clk'event and clk = '1') then
-      --NTT/INTT on
-      if(mode_s /= waiting) then
-        --Calculate next butterfly values when the butterfly is done
-        if(state_s = writeDualPort) then
-          state_s <= readDualPort;
-          if (address_next_s /= std_logic_vector(unsigned(start_s) + unsigned(offset_s))) then
-            address_s  <= address_next_s;
-          --start check
-          elsif(start_next_s(8) /= '1') then
-            start_s <= start_next_s(7 downto 0);
-            address_s  <= start_next_s(7 downto 0);
-            zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
-          --len check
-          elsif(offset_next_s /= x"00") then
-            offset_s <= offset_next_s;
-            start_s  <= x"00";
-            address_s  <= x"00";
-            zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
-          --INTT Done but still needs montgomery run through
-          elsif(mode_s = INTT) then
-            --state_s <= writeSinglePort;
-            state_s <= readDualPort;
-            MONT_Mode_s <= '1';
-            address_s  <= x"00";
-            start_s  <= x"00";
-            offset_s <= x"00";
-            zeta_address_s <= x"00";
+      case mode_s is
+        --NTT/INTT on
+        when NTT or INTT =>
+          case state_s is
+              --NTT/INTT State Machine
+              when writeDualPort =>
+                state_s <= readDualPort;
+                --address check
+                if (address_next_s /= std_logic_vector(unsigned(start_s) + unsigned(offset_s))) then
+                  address_s  <= address_next_s;
+                --start check
+                elsif(start_next_s(8) /= '1') then
+                  start_s <= start_next_s(7 downto 0);
+                  address_s  <= start_next_s(7 downto 0);
+                  zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
+                --len check
+                elsif(offset_next_s /= x"00") then
+                  offset_s <= offset_next_s;
+                  start_s  <= x"00";
+                  address_s  <= x"00";
+                  zeta_address_s <= std_logic_vector(unsigned(zeta_address_s) + 1);
+                --Check if it is in INTT to do final additional loop
+                elsif(mode_s = INTT) then
+                  state_s <= readDualPort;
+                  MONT_Mode_s <= '1';
+                  address_s  <= x"00";
+                  start_s  <= x"00";
+                  offset_s <= x"00";
+                  zeta_address_s <= x"00";
+                else
+                  mode_s <= waiting;
+                end if;
+
+              --INTT Last Loop
+              when writeSinglePort =>
+                --Increment montgomery addressing
+                address_s  <= address_next_s;
+                --Check for finish conditions
+                if(address_next_s = x"00") then
+                  mode_s <= waiting;
+                  state_s <= readDualPort;
+                  MONT_Mode_s <= '0';
+                end if;
+
+              --Read State, transition back to write
+              when others => 
+                case MONT_Mode_s is
+                  when '0' =>
+                    state_s <= writeDualPort;
+                  when '1' =>
+                    offset_s <= x"01";
+                    state_s <= writeSinglePort;
+                  when others => --error case
+                    state_s <= readDualPort;
+                end case;
+            end case;
+        
+        --Set the default values and check for the enable
+        when waiting =>
+          --Select NTT/INTT if the module is enabled
+          if(enable = '1') then
+            case NTT_INTT_Select is
+              when '0' => 
+                mode_s <= NTT;
+              when '1' => 
+                mode_s <= INTT;
+              when others =>  --Error case
+                mode_s <= waiting;
+            end case;
           else
             mode_s <= waiting;
-          end if; --j check
-        --Montgomery Runthrough
-        elsif(state_s = writeSinglePort) then
-          --Increment montgomery addressing
-          address_s  <= address_next_s;
-
-          --Check for finish conditions
-          if(address_next_s = x"00") then
-            mode_s <= waiting;
-            state_s <= readDualPort;
-            MONT_Mode_s <= '0';
           end if;
-
-        else
-          case MONT_Mode_s is
-            when '0' =>
-              state_s <= writeDualPort;
-            when '1' =>
-              offset_s <= x"01";
-              state_s <= writeSinglePort;
-            when others => --error case
-              state_s <= readDualPort;
-          end case;
-        end if;
-
-      --NTT/INTT Select Block
-      else
-        state_s <= readDualPort;
-        case NTT_INTT_Select is
-          when '0' =>     --NTT
-            offset_s        <= x"80";
-            zeta_address_s  <= x"01";
-          when '1' =>     --INTT
-            offset_s        <= x"01";
-            zeta_address_s  <= x"00";
-          when others =>  --Error Case
-            offset_s        <= x"80";
-            zeta_address_s  <= x"01";
-        end case;
-        start_s         <= x"00";
-        address_s       <= x"00";
-        MONT_Mode_s     <= '0';
-        --Select NTT/INTT if the module is enabled
-        if(enable = '1') then
+          --Set defaults
+          state_s <= readDualPort;
           case NTT_INTT_Select is
-            when '0' => 
-              mode_s <= NTT;
-            when '1' => 
-              mode_s <= INTT;
-            when others =>  --Error case
-              mode_s <= waiting;
+            when '0' =>     --NTT
+              offset_s        <= x"80";
+              zeta_address_s  <= x"01";
+            when '1' =>     --INTT
+              offset_s        <= x"01";
+              zeta_address_s  <= x"00";
+            when others =>  --Error Case
+              offset_s        <= x"80";
+              zeta_address_s  <= x"01";
           end case;
-        else --NTT disabled
-          mode_s <= waiting;
-        end if; --Enable if
-      end if; --mode check if
-    end if; --clk event if
+          start_s         <= x"00";
+          address_s       <= x"00";
+          MONT_Mode_s     <= '0';
+      end case;
+
+    end if;
   end process;
 
   combinatorial: process(mode_s, state_s, offset_s, address_s, zeta_forward_s, zeta_inverse_s, ram_out_ntt) 
