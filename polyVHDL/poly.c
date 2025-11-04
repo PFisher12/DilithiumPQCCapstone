@@ -212,6 +212,8 @@ void poly_uniform(poly *a, unsigned char *buf) {
 * Returns number of sampled coefficients. Can be smaller than len if not enough
 * random bytes were given.
 **************************************************/
+ctr = rej_eta(a->coeffs, N, outbuf, 2*SHAKE256_RATE);
+
 static unsigned int rej_eta(uint32_t *a,
                             unsigned int len,
                             const unsigned char *buf,
