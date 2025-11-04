@@ -1,0 +1,116 @@
+# Compile of polyveck_power2round.vhd failed with 6 errors.
+# Compile of polyveck_power2round.vhd was successful.
+vsim work.polyveck_power2round
+# vsim work.polyveck_power2round 
+# Start time: 16:16:16 on Nov 04,2025
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.polyveck_power2round(rtl)
+do testpower2round.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyveck/polypower2round.mpf
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 16:16:37 on Nov 04,2025
+# vcom -reportprogress 300 -2008 ./polyveck_power2round.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity polyveck_power2round
+# -- Compiling architecture rtl of polyveck_power2round
+# End time: 16:16:37 on Nov 04,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 16:16:39 on Nov 04,2025, Elapsed time: 0:00:23
+# Errors: 0, Warnings: 6
+# vsim work.polyveck_power2round 
+# Start time: 16:16:39 on Nov 04,2025
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.polyveck_power2round(rtl)
+# ** UI-Msg: (vsim-4026) Value "12345" does not represent a literal of the enumeration type.
+# ** UI-Msg: (vsim-4011) Invalid force value: 12345.
+# Error in macro ./testpower2round.do line 41
+# ** UI-Msg: (vsim-4026) Value "12345" does not represent a literal of the enumeration type.
+# ** UI-Msg: (vsim-4011) Invalid force value: 12345.
+# 
+#     while executing
+# "force -deposit sim:/polyveck_power2round/v_in(0)  12345"
+do testpower2round.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyveck/polypower2round.mpf
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 16:19:10 on Nov 04,2025
+# vcom -reportprogress 300 -2008 ./polyveck_power2round.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity polyveck_power2round
+# -- Compiling architecture rtl of polyveck_power2round
+# End time: 16:19:10 on Nov 04,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 16:19:12 on Nov 04,2025, Elapsed time: 0:02:33
+# Errors: 0, Warnings: 1
+# vsim work.polyveck_power2round 
+# Start time: 16:19:12 on Nov 04,2025
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.polyveck_power2round(rtl)
+# ** Fatal: (vsim-3420) Array lengths do not match. Left is 32 (31 downto 0). Right is 18 (31 downto 14).
+#    Time: 90 ns  Iteration: 0  Process: /polyveck_power2round/line__41 File: ./polyveck_power2round.vhd
+# Fatal error in Process line__41 at ./polyveck_power2round.vhd line 63
+# 
+# HDL call sequence:
+# Stopped at ./polyveck_power2round.vhd 63 Process line__41
+# 
+# ===========================================================
+#  Simulation finished.
+#  If 'done' = 1 and state = DONE_STATE, module completed OK.
+# ===========================================================
+# 0 ps
+# 94500 ps
+# Compile of polyveck_power2round.vhd was successful.
+# Compile of polyveck_power2round.vhd was successful.
+do testpower2round.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying C:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyveck/polypower2round.mpf
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 16:24:06 on Nov 04,2025
+# vcom -reportprogress 300 -2008 ./polyveck_power2round.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity polyveck_power2round
+# -- Compiling architecture rtl of polyveck_power2round
+# End time: 16:24:06 on Nov 04,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 16:24:08 on Nov 04,2025, Elapsed time: 0:04:56
+# Errors: 1, Warnings: 3
+# vsim work.polyveck_power2round 
+# Start time: 16:24:08 on Nov 04,2025
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.polyveck_power2round(rtl)
+# ===========================================================
+#  Simulation finished.
+#  If 'done' = 1 and state = DONE_STATE, module completed OK.
+# ===========================================================
+# 0 ps
+# 210 us
+# End time: 16:24:44 on Nov 04,2025, Elapsed time: 0:00:36
+# Errors: 0, Warnings: 1
