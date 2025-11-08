@@ -1,0 +1,97 @@
+m255
+K4
+z2
+!s11e MIXED_VERSIONS
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyetauniformVHDL/DilithiumPQCCapstone/polyVHDL/polyrejModelSim
+Epolyveck_freeze
+Z0 w1762290498
+Z1 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
+Z2 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z3 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
+!i122 4
+Z4 dC:/Users/fishe/OneDrive/Documents/Villanova JR Year/Capstone/polyveck
+Z5 8./polyveck_freeze.vhd
+Z6 F./polyveck_freeze.vhd
+l0
+L11 1
+Vj;AEDj5M@BM[cLz:=a0hz1
+!s100 CU`4bbhA7<<BE7HF4jD1d2
+Z7 OV;C;2020.1;71
+33
+Z8 !s110 1762290787
+!i10b 1
+Z9 !s108 1762290787.000000
+Z10 !s90 -reportprogress|300|-2008|./polyveck_freeze.vhd|
+Z11 !s107 ./polyveck_freeze.vhd|
+!i113 1
+Z12 o-2008
+Z13 tExplicit 1 CvgOpt 0
+Artl
+R1
+R2
+R3
+DEx4 work 15 polyveck_freeze 0 22 j;AEDj5M@BM[cLz:=a0hz1
+!i122 4
+l54
+L28 78
+V?dQbWjb@KTlE_Fb:JMXkc3
+!s100 >g`Q466lWX48f:<NCIo302
+R7
+33
+R8
+!i10b 1
+R9
+R10
+R11
+!i113 1
+R12
+R13
+Epolyveck_power2round
+Z14 w1762291434
+R1
+R2
+R3
+!i122 10
+R4
+Z15 8./polyveck_power2round.vhd
+Z16 F./polyveck_power2round.vhd
+l0
+L18 1
+VWc=zmiD^8h1JLz`TYQ_Mn1
+!s100 m9j7I<4>I6gKFh:lNiC7i3
+R7
+33
+Z17 !s110 1762291446
+!i10b 1
+Z18 !s108 1762291446.000000
+Z19 !s90 -reportprogress|300|-2008|./polyveck_power2round.vhd|
+!s107 ./polyveck_power2round.vhd|
+!i113 1
+R12
+R13
+Artl
+R1
+R2
+R3
+DEx4 work 20 polyveck_power2round 0 22 Wc=zmiD^8h1JLz`TYQ_Mn1
+!i122 10
+l44
+Z20 L35 79
+VGDScRJN39>I?1jD@j_Bo;0
+Z21 !s100 KJ:G]_`3ITffSgdBIYhXX2
+R7
+33
+R17
+!i10b 1
+R18
+R19
+Z22 !s107 ./polyveck_power2round.vhd|
+!i113 1
+R12
+R13

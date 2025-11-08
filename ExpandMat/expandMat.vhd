@@ -22,12 +22,13 @@ end entity;
 
 architecture RTL of expandMat is 
 
-  type mode is (Waiting, Operation);
+  type mode is (Waiting, Operation, Startup);
   signal mode_s : mode := Waiting;
   type RAM_state is (Read_A, Read_B);
   signal RAM_state_s : RAM_state := Read_A;
   signal value_a_s, value_b_s, data_a_s, data_b_s : std_logic_vector(31 downto 0);
   signal ram_r_address_s, ram_w_address_a_s : unsigned(7 downto 0) := (others => '0');
+  signal wren_a_s, wren_b_s : std_logic := '0';
   signal ctr_s : integer := 0;
 
   begin
@@ -38,31 +39,24 @@ architecture RTL of expandMat is
         when Operation =>
           case RAM_state_s is  
             when Read_A =>
-              value_a_s(31 downto 23) <= (others =>'0');
-              value_b_s(31 downto 23) <= (others =>'0');
+              value_a_s(31 downto 0) <= (others =>'0');
+              value_b_s(31 downto 0) <= (others =>'0');
             
               value_a_s(22 downto 0) <= ram_out_expand_buf.q_a(22 downto 0);
               value_b_s(22 downto 0) <= ram_out_expand_buf.q_b(14 downto 0) & ram_out_expand_buf.q_a(31 downto 24);
-
             when Read_B =>
-              value_a_s(31 downto 23) <= (others =>'0');
-              value_b_s(31 downto 23) <= (others =>'0');
+              value_a_s(31 downto 0) <= (others =>'0');
+              value_b_s(31 downto 0) <= (others =>'0');
               
               value_a_s(22 downto 0) <= ram_out_expand_buf.q_b(6 downto 0) & ram_out_expand_buf.q_a(31 downto 16);
               value_b_s(22 downto 0) <= ram_out_expand_buf.q_b(30 downto 8);
-
             when others =>
               value_a_s(31 downto 0) <= (others =>'0');
               value_b_s(31 downto 0) <= (others =>'0');  
           end case;
-          ram_in_expand_coeff.wren_a <= '1';
-          ram_in_expand_coeff.wren_a <= '1';
-
         when others => --This is both the Waiting and error state
           value_a_s(31 downto 0) <= (others =>'0');
           value_b_s(31 downto 0) <= (others =>'0');
-          ram_in_expand_coeff.wren_a <= '0';
-          ram_in_expand_coeff.wren_a <= '0';
       end case;
 
     end process;
@@ -77,47 +71,62 @@ architecture RTL of expandMat is
     ram_in_expand_buf.wren_b <= '0';
     ram_in_expand_buf.data_a <= (others => '0');
     ram_in_expand_buf.data_b <= (others => '0');
+    ram_in_expand_coeff.wren_a <= wren_a_s;
+    ram_in_expand_coeff.wren_b <= wren_b_s;
 
+
+    --TODO potential solution => make a startup state that allows the RAM Address to increment by 1 while not allowing writes, also flip address adds???
     sequential : process(clk)
     begin
       if(clk'event and clk = '1') then
         case mode_s is 
-          when Operation =>
+          when Operation | Startup =>
             case RAM_state_s is  
               when Read_A =>
-                ram_r_address_s <= ram_r_address_s + 1;
+                ram_r_address_s <= ram_r_address_s + 2; --recall the flip
                 RAM_state_s <= Read_B;
               when Read_B =>
-                ram_r_address_s <= ram_r_address_s + 2;
+                ram_r_address_s <= ram_r_address_s + 1; --recall the flip
                 RAM_state_s <= Read_A;
             end case;
 
+            wren_a_s <= '1';
+            wren_b_s <= '1';
             --State machine for write logic
-            if(unsigned(value_a_s) < unsigned(Q) and unsigned(value_b_s) < unsigned(Q)) then
+            if(mode_s = Startup) then 
+              wren_a_s <= '0';
+              wren_b_s <= '0';
+              ram_r_address_s <= ram_r_address_s + 1;
+              RAM_state_s <= Read_A;
+              mode_s <= Operation;
+            elsif(unsigned(value_a_s) < unsigned(Q) and unsigned(value_b_s) < unsigned(Q) and (ctr_s + 2) < 256) then
               data_a_s <= value_a_s;
               data_b_s <= value_b_s;
-              ram_w_address_a_s <= ram_w_address_a_s + 2;
               ctr_s <= ctr_s + 2;
-            elsif (unsigned(value_a_s) < unsigned(Q)) then
+              if(ram_r_address_s > 1) then
+                ram_w_address_a_s <= ram_w_address_a_s + 2;
+              end if;              
+            elsif (unsigned(value_a_s) < unsigned(Q) and (ctr_s + 1) < 256) then
               data_a_s <= value_a_s;
-              ram_w_address_a_s <= ram_w_address_a_s + 1;
               ctr_s <= ctr_s + 1;
-            elsif (unsigned(value_b_s) < unsigned(Q)) then
+              if(ram_r_address_s > 1) then
+                ram_w_address_a_s <= ram_w_address_a_s + 1;
+              end if;
+            elsif (unsigned(value_b_s) < unsigned(Q) and (ctr_s + 1) < 256) then
               data_a_s <= value_b_s;
-              ram_w_address_a_s <= ram_w_address_a_s + 1;
               ctr_s <= ctr_s + 1;
+              if(ram_r_address_s > 1) then
+                ram_w_address_a_s <= ram_w_address_a_s + 1;
+              end if;
+            elsif (ctr_s >= 255) then --If address goes above 255, set state to done
+              mode_s <= Waiting;
+              wren_a_s <= '0';
+              wren_b_s <= '0';
             end if;
             
-            --If address goes above 255, set state to done
-            if (ctr_s >= 256) then 
-              mode_s <= Waiting;
-            else
-              mode_s <= Operation;
-            end if;
-
           when Waiting =>
             if (enable = '1') then
-              mode_s <= Operation;
+              mode_s <= Startup;
               expandMat_ready <= '0';
             else
               ram_r_address_s <= "00000000";
@@ -125,9 +134,6 @@ architecture RTL of expandMat is
 
               data_a_s <= (others => '0');
               data_b_s <= (others => '0');
-
-              value_a_s <= (others => '0');
-              value_b_s <= (others => '0');
 
               expandMat_ready <= '1';
               ctr_s <= 0;

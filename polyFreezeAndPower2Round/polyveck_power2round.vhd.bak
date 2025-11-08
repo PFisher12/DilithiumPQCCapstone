@@ -1,0 +1,88 @@
+-- ==============================================================
+-- polyveck_power2round.vhd
+-- Translated from C: void polyveck_power2round(polyveck *v1, polyveck *v0, const polyveck *v)
+-- Description:
+--   For all coefficients a of polynomials in vector of length K,
+--   compute a0, a1 such that a = a1*2^D + a0
+--   with -2^(D/2) < a0 <= 2^(D/2)
+-- ==============================================================
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity polyveck_power2round is
+  generic (
+    K : integer := 4;       -- number of polynomials in vector
+    N : integer := 256;     -- coefficients per polynomial
+    D : integer := 14       -- decomposition factor (adjust as needed)
+  );
+  port (
+    clk    : in  std_logic;
+    rst_n  : in  std_logic;
+    start  : in  std_logic;
+    done   : out std_logic;
+
+    v_in   : in  unsigned((K*N*32)-1 downto 0);   -- flattened input coeffs
+    v0_out : out unsigned((K*N*32)-1 downto 0);   -- flattened a0 coeffs
+    v1_out : out unsigned((K*N*32)-1 downto 0)    -- flattened a1 coeffs
+  );
+end entity;
+
+architecture rtl of polyveck_power2round is
+
+  type state_type is (IDLE, WORK, DONE_STATE);
+  signal state : state_type := IDLE;
+
+  signal idx : integer range 0 to (K*N);
+  signal temp_a, temp_a0, temp_a1 : unsigned(31 downto 0);
+
+begin
+  process(clk, rst_n)
+  begin
+    if rst_n = '0' then
+      state <= IDLE;
+      idx   <= 0;
+      done  <= '0';
+
+    elsif rising_edge(clk) then
+      case state is
+
+        when IDLE =>
+          done <= '0';
+          if start = '1' then
+            idx   <= 0;
+            state <= WORK;
+          end if;
+
+        when WORK =>
+          -- Extract one 32-bit coefficient
+          temp_a <= v_in((idx+1)*32 - 1 downto idx*32);
+
+          -- Compute power2round decomposition
+          temp_a1 <= temp_a(31 downto D); -- a1 = high bits
+          temp_a0 <= temp_a(D-1 downto 0); -- a0 = low bits
+
+          -- Store results
+          v1_out((idx+1)*32 - 1 downto idx*32) <= temp_a1;
+          v0_out((idx+1)*32 - 1 downto idx*32) <= temp_a0;
+
+          -- Increment index or finish
+          if idx = K*N - 1 then
+            state <= DONE_STATE;
+          else
+            idx <= idx + 1;
+          end if;
+
+        when DONE_STATE =>
+          done <= '1';
+          if start = '0' then
+            state <= IDLE;
+          end if;
+
+      end case;
+    end if;
+  end process;
+
+end architecture;
+
